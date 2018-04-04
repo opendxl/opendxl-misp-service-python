@@ -22,7 +22,8 @@ setup(
     # Package requirements
     install_requires=[
         "dxlbootstrap>=0.1.3",
-        "dxlclient"
+        "dxlclient",
+        "pyzmq"
     ],
 
     # Python version requirements

@@ -25,7 +25,7 @@ def signal_handler(signum, frame):
     :param frame: The frame
     """
     del signum, frame
-    global running, run_condition
+    global running, run_condition  # pylint: disable=global-statement
     with run_condition:
         if running:
             # Stop the application

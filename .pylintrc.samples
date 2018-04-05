@@ -127,14 +127,18 @@ disable=print-statement,
         dict-items-not-iterating,
         dict-keys-not-iterating,
         dict-values-not-iterating,
-        unused-wildcard-import,
+        invalid-name,
+        wrong-import-position,
+        missing-docstring,
         wildcard-import,
+        unused-wildcard-import,
         broad-except,
         too-few-public-methods,
-        too-many-arguments,
-        too-many-instance-attributes,
-        missing-docstring,
-        protected-access
+        redefined-outer-name,
+        undefined-variable,
+        logging-not-lazy,
+        import-error,
+        similarities
 
 
 # Enable the message, report, category or checker with the given id(s). You can
@@ -243,15 +247,7 @@ good-names=i,
            ex,
            Run,
            _,
-           f,
-           fh,
-           logger,
-           running,
-           run_condition,
-           config_dir,
-           logging_config_path,
-           log_formatter,
-           console_handler
+           logger
 
 # Include a hint for the correct naming format with invalid-name
 include-naming-hint=no
@@ -303,7 +299,7 @@ variable-naming-style=snake_case
 expected-line-ending-format=
 
 # Regexp for a line that is allowed to be longer than the limit.
-ignore-long-lines=^\s*(# )?<?https?://\S+>?$
+ignore-long-lines=^.*(# )?<?https?://\S+>?$
 
 # Number of spaces of indent required inside a hanging  or continued line.
 indent-after-paren=4
@@ -528,10 +524,7 @@ allow-wildcard-with-all=no
 analyse-fallback-blocks=no
 
 # Deprecated modules which should not be used, separated by a comma
-deprecated-modules=regsub,
-                   TERMIOS,
-                   Bastion,
-                   rexec
+deprecated-modules=optparse,tkinter.tix
 
 # Create a graph of external dependencies in the given file (report RP0402 must
 # not be disabled)

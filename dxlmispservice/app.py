@@ -4,10 +4,11 @@ import os
 import threading
 import zmq
 
+from pymisp import PyMISP
+
 from dxlbootstrap.app import Application
 from dxlclient import ServiceRegistrationInfo
 from dxlclient.message import Event
-from pymisp import PyMISP
 from dxlmispservice._requesthandlers import MispServiceRequestCallback
 
 # Configure local logger
@@ -55,6 +56,8 @@ class MispService(Application):
         self._api_client = None
         self._api_names = ()
         self._pymisp_client = None
+        self._zeromq_notification_topics = None
+        self._zeromq_poller = None
         self._zeromq_socket = None
         self._zeromq_thread = None
 
@@ -243,7 +246,7 @@ class MispService(Application):
 
     def _start_zeromq_listener(self, host, port):
         context = zmq.Context()
-        self._zeromq_socket = context.socket(zmq.SUB)
+        self._zeromq_socket = context.socket(zmq.SUB) # pylint: disable=no-member
         socket_url = "tcp://%s:%s" % (host, port)
         logger.info("Connecting to zeromq URL: %s", socket_url)
         self._zeromq_socket.connect(socket_url)

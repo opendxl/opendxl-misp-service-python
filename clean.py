@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import os
+# pylint: disable=no-name-in-module, import-error
 from distutils.dir_util import remove_tree
 from shutil import copyfile
 

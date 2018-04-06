@@ -20,25 +20,61 @@ class MispService(Application):
     The "MISP DXL service library" application class.
     """
 
+    #: The base name for MISP DXL service and topics.
     _SERVICE_BASE_NAME = "/opendxl-misp/service"
+    #: The DXL service type for the MISP API.
     _SERVICE_TYPE = _SERVICE_BASE_NAME + "/misp-api"
 
+    #: The name of the "General" section within the application configuration
+    #: file.
     _GENERAL_CONFIG_SECTION = "General"
+    #: The property used to specify a unique service discriminator to the
+    #: application configuration file. The discriminator, if set, is added to
+    #: each of the MISP API topics registered with and each of the MISP event
+    #: notifications delivered through the DXL fabric.
     _GENERAL_SERVICE_UNIQUE_ID_PROP = "serviceUniqueId"
+    #: The property used to specify the hostname or IP address of an
+    #: MISP server in the application configuration file.
     _GENERAL_HOST_CONFIG_PROP = "host"
+    #: The property used to specify the port number of the MISP API server in
+    #: the application configuration file.
     _GENERAL_API_PORT_CONFIG_PROP = "apiPort"
+    #: The property used to specify the MISP API key in the application
+    #: configuration file.
     _GENERAL_API_KEY_CONFIG_PROP = "apiKey"
+    #: The property used to specify the list of accessible MISP APIs in the
+    #: application configuration file
     _GENERAL_API_NAMES_CONFIG_PROP = "apiNames"
+    #: The property used to specify in the application configuration file a
+    #: path to a client certificate which is supplied to the MISP
+    #: server for TLS/SSL connections.
     _GENERAL_CLIENT_CERTIFICATE_CONFIG_PROP = "clientCertificate"
+    #: The property used to specify in the application configuration file a
+    #: private key to use when making TLS/SSL connnections to a MISP
+    #: server.
     _GENERAL_CLIENT_KEY_CONFIG_PROP = "clientKey"
+    #: The property used to specify in the application configuration file
+    #: whether or not the MISP server certificate was signed by
+    #: a valid certificate authority.
     _GENERAL_VERIFY_CERTIFICATE_CONFIG_PROP = "verifyCertificate"
+    #: The property used to specify in the application configuration file
+    #: a path to a bundle of trusted CA certificates to use for validating the
+    #: MISP server's certificate.
     _GENERAL_VERIFY_CERT_BUNDLE_CONFIG_PROP = "verifyCertBundle"
+    #: The property used to specify the port number of the MISP ZeroMQ server in
+    #: the application configuration file.
     _GENERAL_ZEROMQ_PORT_CONFIG_PROP = "zeroMqPort"
+    #: The property used to specify in the application configuration file the
+    #: names of the MISP ZeroMQ topics for which corresponding events should be
+    #: delivered to the DXL fabric.
     _GENERAL_ZEROMQ_NOTIFICATION_TOPICS_CONFIG_PROP = "zeroMqNotificationTopics"
 
+    #: Default port number at which the MISP API server is expected to be hosted.
     _DEFAULT_API_PORT = 443
+    #: Default port number at which the MISP ZeroMQ server is expected to be hosted.
     _DEFAULT_ZEROMQ_PORT = 50000
 
+    #: The base name for DXL topics delivered for MISP ZeroMQ notifications.
     _ZEROMQ_NOTIFICATIONS_EVENT_TOPIC = _SERVICE_BASE_NAME + \
                                         "/zeromq-notifications"
 
@@ -158,7 +194,7 @@ class MispService(Application):
         This callback provides the opportunity for the application to parse
         additional configuration properties.
 
-        :param config: The application configuration
+        :param configparser.ConfigParser config: The application configuration
         """
         logger.info("On 'load configuration' callback.")
 
@@ -183,6 +219,8 @@ class MispService(Application):
             return_type=list,
             default_value=[])
 
+        # Only validate MISP API configuration and connect to a MISP API server
+        # if at least one API name was specified in the configuration file.
         if self._api_names:
             api_key = self._get_setting_from_config(
                 self._GENERAL_CONFIG_SECTION,
@@ -235,6 +273,9 @@ class MispService(Application):
             return_type=list,
             default_value=[])
 
+        # Only validate MISP ZeroMQ configuration and connect to a MISP ZeroMQ
+        # server if at least one ZeroMQ topic was specified in the configuration
+        # file.
         if self._zeromq_notification_topics:
             zeromq_port = self._get_setting_from_config(
                 self._GENERAL_CONFIG_SECTION,
@@ -245,15 +286,23 @@ class MispService(Application):
             self._start_zeromq_listener(host, zeromq_port)
 
     def _start_zeromq_listener(self, host, port):
+        """
+        Connect to the MISP ZeroMQ server, subscribe for notifications for
+        configured topics, and start a background thread which processes
+        notifications.
+
+        :param str host: Host name / ip address of the MISP ZeroMQ server.
+        :param int port: Port at which the MISP ZeroMQ server is hosted.
+        """
         context = zmq.Context()
         self._zeromq_socket = context.socket(zmq.SUB) # pylint: disable=no-member
         socket_url = "tcp://%s:%s" % (host, port)
-        logger.info("Connecting to zeromq URL: %s", socket_url)
+        logger.info("Connecting to ZeroMQ URL: %s", socket_url)
         self._zeromq_socket.connect(socket_url)
         for topic in self._zeromq_notification_topics:
-            logger.debug("Subscribing to zeromq topic: %s", topic)
+            logger.debug("Subscribing to ZeroMQ topic: %s", topic)
             self._zeromq_socket.subscribe(topic)
-        logger.info("Waiting for zeromq notifications: %s",
+        logger.info("Waiting for ZeroMQ notifications: %s",
                     self._zeromq_notification_topics)
 
         self._zeromq_poller = zmq.Poller()
@@ -265,9 +314,15 @@ class MispService(Application):
         self._zeromq_thread.start()
 
     def _process_zeromq_messages(self):
+        """
+        Poll for MISP ZeroMQ notifications. On receipt of a notification,
+        send a corresponding event to the DXL fabric.
+        """
         while not self.__destroyed:
             try:
                 socks = dict(self._zeromq_poller.poll(timeout=None))
+            # A ZMQError would be raised if the socket is shut down while
+            # blocked in a poll.
             except zmq.ZMQError:
                 socks = {}
             if self._zeromq_socket in socks and \
@@ -287,18 +342,22 @@ class MispService(Application):
                 self.client.send_event(event)
 
     def destroy(self):
+        """
+        Destroys the application (disconnects from fabric and frees resources
+        allocated to handle MISP ZeroMQ notifications)
+        """
         super(MispService, self).destroy()
         with self.__lock:
             if not self.__destroyed:
                 self.__destroyed = True
                 if self._zeromq_socket:
-                    logger.debug("Closing zeromq socket ...")
+                    logger.debug("Closing ZeroMQ socket ...")
                     self._zeromq_socket.close()
                 if self._zeromq_thread:
                     logger.debug(
-                        "Waiting for zeromq message thread to terminate ...")
+                        "Waiting for ZeroMQ message thread to terminate ...")
                     self._zeromq_thread.join()
-                    logger.debug("Zeromq message thread terminated")
+                    logger.debug("ZeroMQ message thread terminated")
 
     def on_dxl_connect(self):
         """

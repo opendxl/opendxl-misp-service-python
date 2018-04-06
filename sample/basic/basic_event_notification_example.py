@@ -52,7 +52,7 @@ with DxlClient(config) as client:
         "threat_level_id": 3
     })
 
-    print("Create new MISP event and wait for notification via zeromq ...")
+    print("Create new MISP event and wait for notification via ZeroMQ ...")
     new_event_response = client.sync_request(new_event_request, timeout=30)
 
     if new_event_response.message_type == Message.MESSAGE_TYPE_ERROR:

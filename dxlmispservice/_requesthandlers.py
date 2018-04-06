@@ -3,7 +3,7 @@ import logging
 
 from dxlbootstrap.util import MessageUtils
 from dxlclient.callbacks import RequestCallback
-from dxlclient.message import Response
+from dxlclient.message import ErrorResponse, Response
 
 # Configure local logger
 logger = logging.getLogger(__name__)
@@ -32,16 +32,22 @@ class MispServiceRequestCallback(RequestCallback):
         logger.debug("Payload for topic %s: %s", request.destination_topic,
                      request.payload)
 
-        res = Response(request)
+        try:
+            res = Response(request)
 
-        request_dict = MessageUtils.json_payload_to_dict(request) \
-            if request.payload else {}
-        if "event" in request_dict and \
-                type(request_dict["event"]).__name__ in ("str", "unicode") and \
-                request_dict["event"].isdigit():
-            request_dict["event"] = int(request_dict["event"])
+            request_dict = MessageUtils.json_payload_to_dict(request) \
+                if request.payload else {}
+            if "event" in request_dict and \
+                    type(request_dict["event"]).__name__ in ("str", "unicode") and \
+                    request_dict["event"].isdigit():
+                request_dict["event"] = int(request_dict["event"])
 
-        response_data = self._api_method(**request_dict)
-        MessageUtils.dict_to_json_payload(res, response_data)
+            response_data = self._api_method(**request_dict)
+            MessageUtils.dict_to_json_payload(res, response_data)
+        except Exception as ex:
+            error_str = str(ex)
+            logger.exception("Error handling request: %s", error_str)
+            res = ErrorResponse(request,
+                                error_message=MessageUtils.encode(error_str))
 
         self._app.client.send_response(res)

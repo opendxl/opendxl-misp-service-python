@@ -1,5 +1,5 @@
-MISP DXL service library
-========================
+MISP DXL Python Service
+=======================
 
 Introduction
 ------------
@@ -19,25 +19,46 @@ Installation and Configuration
 	configuration
 	running
 
+Service Methods
+---------------
+
+.. toctree::
+	:maxdepth: 1
+
+	servicemethods
+
+Docker
+------
+
+.. toctree::
+	:maxdepth: 1
+
+	docker
+
 Samples
 -------
 
 Configuration
 
 .. toctree::
-    :maxdepth: 1
+	:maxdepth: 1
 
-    sampleconfig
+	sampleconfig
 
 Basic
 
-    TODO: Provide samples documentation
+.. toctree::
+	:maxdepth: 1
+
+	basicneweventexample
+	basicupdateeventexample
+	basiceventnotificationexample
 
 Python API
 ----------
 
 .. toctree::
-    :titlesonly:
+	:titlesonly:
 
-    dxlmispservice
+	dxlmispservice
 

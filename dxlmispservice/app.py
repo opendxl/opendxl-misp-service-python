@@ -17,12 +17,12 @@ logger = logging.getLogger(__name__)
 
 class MispService(Application):
     """
-    The "MISP DXL service library" application class.
+    The "MISP DXL Python Service" application class.
     """
 
-    #: The base name for MISP DXL service and topics.
+    #: The base name for MISP DXL Python Service and topics.
     _SERVICE_BASE_NAME = "/opendxl-misp/service"
-    #: The DXL service type for the MISP API.
+    #: The DXL Python Service type for the MISP API.
     _SERVICE_TYPE = _SERVICE_BASE_NAME + "/misp-api"
 
     #: The name of the "General" section within the application configuration

@@ -4,7 +4,7 @@ MISP DXL Python Service
 Overview
 --------
 
-The MISP DXL Python service exposes access to the
+The MISP DXL Python Service exposes access to the
 `MISP REST APIs <https://misp.gitbooks.io/misp-book/content/automation/#automation-api>`_
 via the `Data Exchange Layer <http://www.mcafee.com/us/solutions/data-exchange-layer.aspx>`_
 (DXL) fabric. The service also provides support for forwarding
@@ -15,10 +15,10 @@ Documentation
 -------------
 
 See the `GitHub Wiki <https://github.com/opendxl/opendxl-misp-service-python/wiki>`_
-for an overview of the MISP DXL Python service and usage examples.
+for an overview of the MISP DXL Python Service and usage examples.
 
 See the
-`MISP DXL Python service documentation <https://opendxl.github.io/opendxl-misp-service-python/pydoc>`_
+`MISP DXL Python Service documentation <https://opendxl.github.io/opendxl-misp-service-python/pydoc>`_
 for installation instructions, API documentation, and usage examples.
 
 Bugs and Feedback

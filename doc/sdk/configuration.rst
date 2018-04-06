@@ -1,7 +1,7 @@
 Configuration
 =============
 
-The MISP DXL service library application requires a set of configuration files to operate.
+The MISP DXL Python Service application requires a set of configuration files to operate.
 
 This distribution contains a ``config`` sub-directory that includes the configuration files that must
 be populated prior to running the application.
@@ -44,26 +44,109 @@ DXL Client Configuration File (dxlclient.config)
 
 .. _dxl_service_config_file_label:
 
-MISP DXL service library (dxlmispservice.config)
-------------------------------------------------
+MISP DXL Python Service (dxlmispservice.config)
+-----------------------------------------------
 
     The required ``dxlmispservice.config`` file is used to configure the application.
 
     The following is an example of a populated application configuration file:
 
-        .. code-block:: python
+        .. code-block:: ini
 
-            TODO: Provide configuration file example
+            [General]
+            host=mispserver1
+            apiKey=12345
+            apiNames=new_event,search,add_internal_comment,tag,sighting
+            verifyCertificate=yes
+            verifyCertBundle=mispCA.crt
+            zeroMqNotificationTopics=misp_json_event,misp_json_sighting
 
-    **TODO: Provide section name**
+    **General**
 
-        The ``TODO: Provide section name`` section is used to specify...
+        The ``[General]`` section is used to specify the MISP server
+        configuration, MISP API methods which should be available to invoke via
+        DXL, and MISP ZeroMQ messages which should be forwarded on to the DXL
+        fabric.
 
-        +------------------------+----------+--------------------------------------------------------------------+
-        | Name                   | Required | Description                                                        |
-        +========================+==========+====================================================================+
-        | TODO: Provide property | yes      | TODO: Provide property description                                 |
-        +------------------------+----------+--------------------------------------------------------------------+
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | Name                             | Required | Description                                                                                            |
+        +==================================+==========+========================================================================================================+
+        | host                             | yes      | The MISP server hostname or IP address.                                                                |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | serviceUniqueId                  | no       | An optional unique identifier used to identify the                                                     |
+        |                                  |          | opendxl-misp service on the DXL fabric. If set, this                                                   |
+        |                                  |          | unique identifier will be appended to the name of each event and request                               |
+        |                                  |          | topic used on the fabric. For example, if the serviceUniqueId is                                       |
+        |                                  |          | set to ``sample``, the request and event topic names would start with the                              |
+        |                                  |          | following, respectively:                                                                               |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/service/misp-api/sample/<method>``                                                     |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/service/zeromq-notifications/sample/<zeromq-topic>``                                   |
+        |                                  |          |                                                                                                        |
+        |                                  |          | If serviceUniqueId is not set, request and event topic names would not                                 |
+        |                                  |          | include an id segment, for example:                                                                    |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/service/misp-api/<method>``                                                            |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/service/zeromq-notifications/<zeromq-topic>``                                          |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | apiNames                         | no       | The list of MISP APIs for which corresponding request topics should be exposed                         |
+        |                                  |          | to the DXL fabric, delimited by commas.                                                                |
+        |                                  |          |                                                                                                        |
+        |                                  |          | For example: ``new_event,search,update``                                                               |
+        |                                  |          |                                                                                                        |
+        |                                  |          | With this example and the ``serviceUniqueId`` setting set to                                           |
+        |                                  |          | ``sample``, the request topics exposed to the DXL fabric would be:                                     |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/service/misp-api/sample/new_event``                                                    |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/service/misp-api/sample/search``                                                       |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/service/misp-api/sample/update``                                                       |
+        |                                  |          |                                                                                                        |
+        |                                  |          | The complete list of available API method names and parameters is available                            |
+        |                                  |          | in the documentation for the pymisp.PyMISP class at                                                    |
+        |                                  |          | https://media.readthedocs.org/pdf/pymisp/latest/pymisp.pdf.                                            |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | apiKey                           | no       | The MISP server's API key. Note that this property is required if one or more ``apiNames`` is          |
+        |                                  |          | specified. The API key is accessible from the MISP web server UI. For more information, see            |
+        |                                  |          | https://misp.gitbooks.io/misp-book/content/automation/#automation-key.                                 |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | apiPort                          | no       | The MISP server's HTTP API port. Defaults to ``443``.                                                  |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | verifyCertificate                | no       | Whether to verify that MISP server's certificate was                                                   |
+        |                                  |          | signed by a valid certificate authority when SSL/TLS is being                                          |
+        |                                  |          | used. Defaults to ``yes``.                                                                             |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | verifyCertBundle                 | no       | A path to a CA Bundle file containing certificates of trusted                                          |
+        |                                  |          | CAs. The CA Bundle is used to ensure that the MISP                                                     |
+        |                                  |          | server being connected to was signed by a valid authority. Only                                        |
+        |                                  |          | applicable if ``verifyCertificate`` is ``yes``.                                                        |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | clientCertificate                | no       | A path to a client certificate supplied to the MISP                                                    |
+        |                                  |          | server for TLS/SSL connections. Defaults to not using a client                                         |
+        |                                  |          | certificate.                                                                                           |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | clientKey                        | no       | A path to a client private key used for TLS/SSL connections made                                       |
+        |                                  |          | to the MISP server. Defaults to not using a client                                                     |
+        |                                  |          | private key.                                                                                           |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | zeroMqNotificationTopics         | no       | The list of topics for MISP ZeroMQ messages which should be forwarded on to the DXL fabric.            |
+        |                                  |          |                                                                                                        |
+        |                                  |          | For example: ``misp_json_event,misp_json_sighting``                                                    |
+        |                                  |          |                                                                                                        |
+        |                                  |          | With this example and the ``serviceUniqueId`` setting set to ``sample``,  any ZeroMQ message with a    |
+        |                                  |          | topic of "misp_json_event" or "misp_json_sighting" would be forwarded as a DXL event with the          |
+        |                                  |          | following topics, respectively:                                                                        |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/service/zeromq-notifications/sample/misp_json_event``                                  |
+        |                                  |          |                                                                                                        |
+        |                                  |          | The complete list of available MISP ZeroMQ messages is available at                                    |
+        |                                  |          | https://misp.gitbooks.io/misp-book/content/misp-zmq/.                                                  |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
+        | zeroMqPort                       | no       | The MISP server's ZeroMQ notification port. Defaults to ``50000``.                                     |
+        +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
 
 Logging File (logging.config)
 -----------------------------

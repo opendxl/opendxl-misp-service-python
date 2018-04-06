@@ -105,7 +105,7 @@ setup(
     # Details
     url="http://www.mcafee.com",
 
-    description="MISP DXL Python service library",
+    description="MISP DXL Python Service",
 
     long_description=open('README').read(),
 

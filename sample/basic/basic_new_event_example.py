@@ -27,8 +27,11 @@ with DxlClient(config) as client:
 
     logger.info("Connected to DXL fabric.")
 
+    # Create the new event request
     request_topic = "/opendxl-misp/service/misp-api/new_event"
     new_event_request = Request(request_topic)
+
+    # Set the payload for the new event request
     MessageUtils.dict_to_json_payload(new_event_request, {
         "distribution": 3,
         "info": "OpenDXL MISP new event example",
@@ -36,9 +39,11 @@ with DxlClient(config) as client:
         "threat_level_id": 3
     })
 
+    # Send the new event request
     new_event_response = client.sync_request(new_event_request, timeout=30)
 
     if new_event_response.message_type != Message.MESSAGE_TYPE_ERROR:
+        # Display results for the new event request
         new_event_response_dict = MessageUtils.json_payload_to_dict(
             new_event_response)
         print("Response to the new event request:\n{}".format(
@@ -50,15 +55,20 @@ with DxlClient(config) as client:
             new_event_response.error_code))
         exit(1)
 
+    # Create the new search request
     request_topic = "/opendxl-misp/service/misp-api/search"
     search_request = Request(request_topic)
+
+    # Set the payload for the search request
     MessageUtils.dict_to_json_payload(search_request, {
         "eventid": new_event_response_dict["Event"]["id"],
     })
 
+    # Send the search request
     search_response = client.sync_request(search_request, timeout=30)
 
     if search_response.message_type != Message.MESSAGE_TYPE_ERROR:
+        # Display results for the search request
         search_response_dict = MessageUtils.json_payload_to_dict(
             search_response)
         print("Response to the search request for the new MISP event:\n{}".format(

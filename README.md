@@ -8,7 +8,7 @@
 
 ## Overview
 
-The MISP DXL Python service exposes access to the 
+The MISP DXL Python Service exposes access to the
 [MISP REST APIs](https://misp.gitbooks.io/misp-book/content/automation/#automation-api)
 via the [Data Exchange Layer](http://www.mcafee.com/us/solutions/data-exchange-layer.aspx)
 (DXL) fabric. The service also provides support for forwarding
@@ -18,10 +18,10 @@ notifications to the DXL fabric.
 ## Documentation
 
 See the [Wiki](https://github.com/opendxl/opendxl-misp-service-python/wiki)
-for an overview of the MISP API DXL Python service and usage examples.
+for an overview of the MISP DXL Python Service and usage examples.
 
 See the
-[MISP DXL Python service documentation](https://opendxl.github.io/opendxl-misp-service-python/pydoc)
+[MISP DXL Python Service documentation](https://opendxl.github.io/opendxl-misp-service-python/pydoc)
 for installation instructions, API documentation, and usage examples.
 
 ## Installation
@@ -37,7 +37,7 @@ To start using the MISP DXL Python Service:
 ## Docker Support
 
 A pre-built Docker image can be used as an alternative to installing a Python
-environment with the modules required for the MISP DXL service.
+environment with the modules required for the MISP DXL Python Service.
 
 See the
 [Docker Support Documentation](https://opendxl.github.io/opendxl-misp-service-python/pydoc/docker.html)

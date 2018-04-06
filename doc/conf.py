@@ -30,7 +30,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = "MISP DXL service library"
+project = "MISP DXL Python Service"
 copyright = "Copyright 2018"
 
 # The version info for the project you're documenting, acts as replacement for

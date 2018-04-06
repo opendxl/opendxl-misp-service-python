@@ -31,20 +31,29 @@ with DxlClient(config) as client:
 
     logger.info("Connected to DXL fabric.")
 
+    # Create and add event listener
     class MyEventCallback(EventCallback):
         def on_event(self, event):
             event_payload_dict = MessageUtils.json_payload_to_dict(event)
+            # Check the event payload to see if the OpenDXL event was triggered
+            # by the new MISP event that the sample created.
             if "Event" in event_payload_dict and \
                 "info" in event_payload_dict["Event"] and \
-                "OpenDXL" in event_payload_dict["Event"]["info"]:
+                event_payload_dict["Event"]["info"] == \
+                    "OpenDXL MISP event notification example":
+                # Print the payload for the received event
                 print("Received event:\n{}".format(
                     MessageUtils.dict_to_json(event_payload_dict,
                                               pretty_print=True)))
 
+    # Register the callback with the client
     client.add_event_callback(EVENT_TOPIC, MyEventCallback())
 
+    # Create the new event request
     request_topic = "/opendxl-misp/service/misp-api/new_event"
     new_event_request = Request(request_topic)
+
+    # Set the payload for the new event request
     MessageUtils.dict_to_json_payload(new_event_request, {
         "distribution": 3,
         "info": "OpenDXL MISP event notification example",
@@ -53,6 +62,8 @@ with DxlClient(config) as client:
     })
 
     print("Create new MISP event and wait for notification via ZeroMQ ...")
+
+    # Send the new event request
     new_event_response = client.sync_request(new_event_request, timeout=30)
 
     if new_event_response.message_type == Message.MESSAGE_TYPE_ERROR:
@@ -61,4 +72,6 @@ with DxlClient(config) as client:
             new_event_response.error_code))
         exit(1)
 
+    # Wait a few seconds for the new MISP event notification to be delivered
+    # to the DXL fabric
     time.sleep(5)

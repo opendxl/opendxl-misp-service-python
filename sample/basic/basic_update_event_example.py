@@ -75,10 +75,31 @@ with DxlClient(config) as client:
             add_internal_comment_response.error_code))
         exit(1)
 
+    internal_comment_attribute_id = \
+        add_internal_comment_response_dict[0]["Attribute"]["uuid"]
+
+    request_topic = "/opendxl-misp/service/misp-api/tag"
+    tag_request = Request(request_topic)
+    MessageUtils.dict_to_json_payload(tag_request, {
+        "uuid": internal_comment_attribute_id,
+        "tag": "Tagged by the OpenDXL MISP update event example"
+    })
+
+    tag_response = client.sync_request(tag_request, timeout=30)
+
+    if tag_response.message_type != Message.MESSAGE_TYPE_ERROR:
+        tag_response_dict = MessageUtils.json_payload_to_dict(tag_response)
+        print("Response to the tag request:\n{}".format(
+            MessageUtils.dict_to_json(tag_response_dict, pretty_print=True)))
+    else:
+        print("Error invoking service with topic '{}': {} ({})".format(
+            request_topic, tag_response.error_message, tag_response.error_code))
+        exit(1)
+
     request_topic = "/opendxl-misp/service/misp-api/sighting"
     sighting_request = Request(request_topic)
     MessageUtils.dict_to_json_payload(sighting_request, {
-        "uuid": add_internal_comment_response_dict[0]["Attribute"]["uuid"],
+        "uuid": internal_comment_attribute_id,
         "type": "0",
         "source": "Seen by the OpenDXL MISP update event example"
     })

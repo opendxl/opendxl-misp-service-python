@@ -160,6 +160,8 @@ class Sample(unittest.TestCase):
             req_mock.post(self.get_api_endpoint("attributes/add/" + event_id),
                           text='{"Attribute": {"uuid": "' +
                           attribute_uuid + '"}}')
+            req_mock.post(self.get_api_endpoint("tags/attachTagToObject"),
+                          text='{"response": "tag"}')
             req_mock.post(self.get_api_endpoint("sightings/add/"),
                           text='{"response": "sighting"}')
             req_mock.post(self.get_api_endpoint("events/restSearch/download"),
@@ -170,9 +172,9 @@ class Sample(unittest.TestCase):
             add_request_mocks
         )
         request_count = len(req_mock.request_history)
-        self.assertGreater(request_count, 3)
+        self.assertGreater(request_count, 4)
 
-        attribute_request = req_mock.request_history[request_count-3]
+        attribute_request = req_mock.request_history[request_count-4]
         self.assertEqual([{
             "category": "Internal reference",
             "value": "Added by the OpenDXL MISP update event example",
@@ -181,6 +183,12 @@ class Sample(unittest.TestCase):
             "to_ids": False,
             "disable_correlation": False
             }], attribute_request.json())
+
+        tag_request = req_mock.request_history[request_count-3]
+        self.assertEqual({
+            "uuid": attribute_uuid,
+            "tag": "Tagged by the OpenDXL MISP update event example"
+        }, tag_request.json())
 
         sighting_request = req_mock.request_history[request_count-2]
         self.assertEqual({
@@ -202,6 +210,10 @@ class Sample(unittest.TestCase):
             StringMatches(
                 "Response to the add internal comment request:.*Attribute.*uuid.*" +
                 attribute_uuid
+            ))
+        mock_print.assert_any_call(
+            StringMatches(
+                "Response to the tag request:.*response.*tag"
             ))
         mock_print.assert_any_call(
             StringMatches(

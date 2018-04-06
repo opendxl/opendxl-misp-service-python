@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import json
 import re
 import sys
 from tempfile import NamedTemporaryFile
@@ -43,9 +44,11 @@ class StringDoesNotMatch(object):
 class Sample(unittest.TestCase):
     _TEST_HOSTNAME = "127.0.0.1"
     _TEST_API_KEY = "myspecialkey"
+    _TEST_API_PORT = "443"
 
     def get_api_endpoint(self, path):
-        return "https://" + self._TEST_HOSTNAME + ":443/" + path
+        return "https://" + self._TEST_HOSTNAME + ":" + self._TEST_API_PORT + \
+               "/" + path
 
     def run_sample(self, sample_file, add_request_mocks_fn=None):
         sample_globals = {"__file__": sample_file}
@@ -65,6 +68,11 @@ class Sample(unittest.TestCase):
             )
             config.set(
                 dxlmispservice.MispService._GENERAL_CONFIG_SECTION,
+                dxlmispservice.MispService._GENERAL_API_PORT_CONFIG_PROP,
+                self._TEST_API_PORT
+            )
+            config.set(
+                dxlmispservice.MispService._GENERAL_CONFIG_SECTION,
                 dxlmispservice.MispService._GENERAL_API_KEY_CONFIG_PROP,
                 self._TEST_API_KEY
             )
@@ -78,6 +86,23 @@ class Sample(unittest.TestCase):
             app._app_config_path = temp_config_file.name
             req_mock.get(self.get_api_endpoint("servers/getPyMISPVersion.json"),
                          text='{"version":"1.2.3"}')
+            types_result = {"result":
+                            {"categories": [
+                                "Internal reference",
+                                "Other"
+                                ],
+                             "sane_defaults":
+                                 {"comment": {
+                                     "default_category": "Other",
+                                     "to_ids": 0
+                                 }},
+                             "types": ["comment"],
+                             "category_type_mappings": {
+                                 "Internal reference": ["comment"],
+                                 "Other": ["comment"]
+                             }}}
+            req_mock.get(self.get_api_endpoint("attributes/describeTypes.json"),
+                         text=json.dumps(types_result))
             if add_request_mocks_fn:
                 add_request_mocks_fn(req_mock, zmq_socket)
             app.run()
@@ -97,6 +122,7 @@ class Sample(unittest.TestCase):
             "sample/basic/basic_new_event_example.py",
             add_request_mocks
         )
+
         request_count = len(req_mock.request_history)
         self.assertGreater(request_count, 1)
 

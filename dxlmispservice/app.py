@@ -91,7 +91,6 @@ class MispService(Application):
         self._service_unique_id = None
         self._api_client = None
         self._api_names = ()
-        self._pymisp_client = None
         self._zeromq_notification_topics = None
         self._zeromq_poller = None
         self._zeromq_socket = None

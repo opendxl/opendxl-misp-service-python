@@ -31,7 +31,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = "MISP DXL Python Service"
-copyright = "Copyright 2018"
+copyright = "2018, McAfee LLC"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

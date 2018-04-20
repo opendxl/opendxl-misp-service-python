@@ -133,6 +133,7 @@ disable=print-statement,
         too-few-public-methods,
         too-many-arguments,
         too-many-instance-attributes,
+        too-many-locals,
         missing-docstring,
         protected-access
 
@@ -294,7 +295,7 @@ variable-naming-style=snake_case
 
 # Regular expression matching correct variable names. Overrides variable-
 # naming-style
-#variable-rgx=
+variable-rgx=[a-z_][a-z0-9_]{2,}$
 
 
 [FORMAT]

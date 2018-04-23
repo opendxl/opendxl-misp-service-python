@@ -67,8 +67,8 @@ setup(
 
     # Requirements
     install_requires=[
-        "dxlbootstrap>=0.1.3",
-        "dxlclient",
+        "dxlbootstrap>=0.2.0",
+        "dxlclient>=4.1.0.184",
         "pymisp",
         "pyzmq"
     ],

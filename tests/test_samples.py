@@ -215,7 +215,7 @@ class Sample(unittest.TestCase):
                 "published": False,
                 "threat_level_id": "3"
             }}
-        mock_attribute_uuid = "79e88e45-09eb-4f9b-ba46-c2c850b5eb03"
+        mock_attribute_uuid = ["79e88e45-09eb-4f9b-ba46-c2c850b5eb03"]
         expected_attribute_detail = {
             "category": "Internal reference",
             "value": "Added by the OpenDXL MISP update event example",
@@ -245,17 +245,28 @@ class Sample(unittest.TestCase):
             }
         }
 
+        def add_attribute_callback(request, context):
+            context.status_code = 200
+            requested_attribute_uuid = request.json()[0].get("uuid", None)
+            # PyMISP started generating a client side random uuid for newly
+            # created attributes in 2.4.90.1. The logic below allows the client
+            # generated uuid to be returned in the mock response only if
+            # present. For earlier PyMISP versions, the default test uuid
+            # assigned to mock_attribute_uuid[0] will be used.
+            if requested_attribute_uuid:
+                mock_attribute_uuid[0] = requested_attribute_uuid
+            expected_attribute_detail_with_id = expected_attribute_detail.copy()
+            expected_attribute_detail_with_id["uuid"] = mock_attribute_uuid[0]
+            return json.dumps({"Attribute": expected_attribute_detail_with_id})
+
         def add_request_mocks(req_mock, _):
             event_detail_with_id = copy.deepcopy(expected_event_detail)
             event_detail_with_id["Event"]["id"] = mock_event_id
             req_mock.post(self.get_api_endpoint("events"),
                           text=json.dumps(event_detail_with_id))
-            expected_attribute_detail_with_id = expected_attribute_detail.copy()
-            expected_attribute_detail_with_id["uuid"] = mock_attribute_uuid
             req_mock.post(
                 self.get_api_endpoint("attributes/add/" + mock_event_id),
-                text=json.dumps(
-                    {"Attribute": expected_attribute_detail_with_id}))
+                text=add_attribute_callback)
             req_mock.post(self.get_api_endpoint("tags/attachTagToObject"),
                           text='{"name": "Tag ' + expected_tag_name + '"}')
             req_mock.post(self.get_api_endpoint("sightings/add/"),
@@ -268,17 +279,35 @@ class Sample(unittest.TestCase):
             add_request_mocks
         )
 
+        expected_attribute_uuid = mock_attribute_uuid[0]
+
         if req_mock:
             request_count = len(req_mock.request_history)
             self.assertGreater(request_count, 4)
 
             attribute_request = req_mock.request_history[request_count - 4]
-            self.assertEqual([expected_attribute_detail],
-                             attribute_request.json())
+            attribute_request_json = attribute_request.json()
+            # PyMISP started generating a client side random uuid for newly
+            # created attributes in 2.4.90.1. The logic below allows the client
+            # generated uuid to be ignored if not present, allowing the
+            # assertion to pass on earlier PyMISP versions.
+            requested_attribute_uuid = attribute_request_json[0].get(
+                "uuid", None)
+            if requested_attribute_uuid:
+                expected_attribute_detail_with_id = \
+                    expected_attribute_detail.copy()
+                expected_attribute_detail_with_id["uuid"] = \
+                    expected_attribute_uuid
+                expected_attribute_request_json = \
+                    [expected_attribute_detail_with_id]
+            else:
+                expected_attribute_request_json = [expected_attribute_detail]
+            self.assertEqual(expected_attribute_request_json,
+                             attribute_request_json)
 
             tag_request = req_mock.request_history[request_count - 3]
             self.assertEqual({
-                "uuid": mock_attribute_uuid,
+                "uuid": expected_attribute_uuid,
                 "tag": expected_tag_name
             }, tag_request.json())
 
@@ -286,7 +315,7 @@ class Sample(unittest.TestCase):
             self.assertEqual({
                 "source": "Seen by the OpenDXL MISP update event example",
                 "type": "0",
-                "uuid": mock_attribute_uuid
+                "uuid": expected_attribute_uuid
             }, sighting_request.json())
 
             search_request = req_mock.request_history[request_count - 1]

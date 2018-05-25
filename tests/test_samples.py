@@ -54,10 +54,10 @@ class Sample(unittest.TestCase):
 
     @staticmethod
     def expected_print_output(title, detail):
-        return_value = title + json.dumps(
-            detail, sort_keys=True,
-            separators=(".*", ": ")).replace("{", ".*")
-        return re.sub(r"[\[}\]]", "", return_value)
+        json_string = title + json.dumps(detail, sort_keys=True,
+                                         separators=(".*", ": "))
+        return re.sub(r"(\.\*)+", ".*",
+                      re.sub(r"[{[\]}]", ".*", json_string))
 
     @staticmethod
     def _run_sample(app, sample_file):

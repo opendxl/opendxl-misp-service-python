@@ -1,0 +1,192 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Service Methods &#8212; MISP DXL Python Service 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Docker Support" href="docker.html" />
+    <link rel="prev" title="Running" href="running.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="docker.html" title="Docker Support"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="running.html" title="Running"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MISP DXL Python Service 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="service-methods">
+<h1>Service Methods<a class="headerlink" href="#service-methods" title="Permalink to this headline">¶</a></h1>
+<p>To make a MISP API method available to the DXL fabric, the method
+name should be added to the <code class="docutils literal notranslate"><span class="pre">apiNames</span></code> setting in the <code class="docutils literal notranslate"><span class="pre">[General]</span></code> section
+of the <a class="reference internal" href="configuration.html#dxl-service-config-file-label"><span class="std std-ref">Service Configuration File</span></a>. The
+service registers a DXL request topic for each valid API name listed in the
+configuration file. A JSON document with the names and values for each API
+parameter should be provided with requests made for the DXL topic.</p>
+<p>For example, to make a request to the MISP <code class="docutils literal notranslate"><span class="pre">new_event</span></code> API method, the
+following steps could be taken:</p>
+<ol class="arabic">
+<li><p class="first">Add <code class="docutils literal notranslate"><span class="pre">new_event</span></code> to the list of <code class="docutils literal notranslate"><span class="pre">apiNames</span></code> in the configuration file:</p>
+<blockquote>
+<div><div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[General]</span>
+<span class="na">apiNames</span><span class="o">=</span><span class="s">new_event,...</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">(Re)start the DXL MISP service.</p>
+<blockquote>
+<div><p>The service should register the following request topic on the DXL fabric:</p>
+<blockquote>
+<div><p><strong>/opendxl-misp/service/misp-api/new_event</strong></p>
+</div></blockquote>
+</div></blockquote>
+</li>
+<li><p class="first">Send a request for the DXL topic with a JSON payload which contains the
+desired parameters, for example:</p>
+<blockquote>
+<div><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="nt">&quot;info&quot;</span><span class="p">:</span> <span class="s2">&quot;new event info&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;analysis&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nt">&quot;threat_level_id&quot;</span><span class="p">:</span> <span class="mi">3</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The service should respond with the contents of the stored event, for
+example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;Event&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;Attribute&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="nt">&quot;Galaxy&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="nt">&quot;Object&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="nt">&quot;Org&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ORGNAME&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;uuid&quot;</span><span class="p">:</span> <span class="s2">&quot;5ac3c55a-41a4-4294-adf3-00f8ac110003&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;Orgc&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ORGNAME&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;uuid&quot;</span><span class="p">:</span> <span class="s2">&quot;5ac3c55a-41a4-4294-adf3-00f8ac110003&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;RelatedEvent&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="nt">&quot;ShadowAttribute&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="nt">&quot;analysis&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;attribute_count&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2018-04-09&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;disable_correlation&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;event_creator_email&quot;</span><span class="p">:</span> <span class="s2">&quot;admin@admin.test&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;169&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;info&quot;</span><span class="p">:</span> <span class="s2">&quot;OpenDXL MISP new event example&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;locked&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nt">&quot;org_id&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;orgc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;proposal_email_lock&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nt">&quot;publish_timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;published&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nt">&quot;sharing_group_id&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;threat_level_id&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;1523287869&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;uuid&quot;</span><span class="p">:</span> <span class="s2">&quot;5acb873d-a914-4f9f-92b9-196cac110002&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+<p>The MISP DXL Python Service APIs are basically just thin wrappers on
+top of the underlying client APIs used in the
+<a class="reference external" href="https://github.com/MISP/PyMISP">PyMISP</a> Python library. For a complete list
+of the available API method names and parameters, see the
+<a class="reference external" href="https://media.readthedocs.org/pdf/pymisp/latest/pymisp.pdf">pymisp.PyMISP class documentation</a>.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="running.html"
+                        title="previous chapter">Running</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="docker.html"
+                        title="next chapter">Docker Support</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/servicemethods.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="docker.html" title="Docker Support"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="running.html" title="Running"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MISP DXL Python Service 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, McAfee LLC.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

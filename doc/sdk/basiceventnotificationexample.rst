@@ -96,7 +96,7 @@ notifications for ``misp_json_event`` MISP ZeroMQ notifications:
 
     .. code-block:: python
 
-        EVENT_TOPIC = "/opendxl-misp/service/zeromq-notifications/misp_json_event"
+        EVENT_TOPIC = "/opendxl-misp/event/zeromq-notifications/misp_json_event"
 
         ...
 

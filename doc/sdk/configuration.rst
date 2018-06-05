@@ -82,14 +82,14 @@ MISP DXL Python Service (dxlmispservice.config)
         |                                  |          |                                                                                                        |
         |                                  |          | ``/opendxl-misp/service/misp-api/sample/<method>``                                                     |
         |                                  |          |                                                                                                        |
-        |                                  |          | ``/opendxl-misp/service/zeromq-notifications/sample/<zeromq-topic>``                                   |
+        |                                  |          | ``/opendxl-misp/event/zeromq-notifications/sample/<zeromq-topic>``                                     |
         |                                  |          |                                                                                                        |
         |                                  |          | If serviceUniqueId is not set, request and event topic names would not                                 |
         |                                  |          | include an id segment, for example:                                                                    |
         |                                  |          |                                                                                                        |
         |                                  |          | ``/opendxl-misp/service/misp-api/<method>``                                                            |
         |                                  |          |                                                                                                        |
-        |                                  |          | ``/opendxl-misp/service/zeromq-notifications/<zeromq-topic>``                                          |
+        |                                  |          | ``/opendxl-misp/event/zeromq-notifications/<zeromq-topic>``                                            |
         +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
         | apiNames                         | no       | The list of MISP APIs for which corresponding request topics should be exposed                         |
         |                                  |          | to the DXL fabric, delimited by commas.                                                                |
@@ -140,7 +140,7 @@ MISP DXL Python Service (dxlmispservice.config)
         |                                  |          | topic of "misp_json_event" or "misp_json_sighting" would be forwarded as a DXL event with the          |
         |                                  |          | following topics, respectively:                                                                        |
         |                                  |          |                                                                                                        |
-        |                                  |          | ``/opendxl-misp/service/zeromq-notifications/sample/misp_json_event``                                  |
+        |                                  |          | ``/opendxl-misp/event/zeromq-notifications/sample/misp_json_event``                                    |
         |                                  |          |                                                                                                        |
         |                                  |          | The complete list of available MISP ZeroMQ messages is available at                                    |
         |                                  |          | https://misp.gitbooks.io/misp-book/content/misp-zmq/.                                                  |

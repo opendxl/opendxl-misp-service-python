@@ -128,11 +128,11 @@ topic used on the fabric. For example, if the serviceUniqueId is
 set to <code class="docutils literal notranslate"><span class="pre">sample</span></code>, the request and event topic names would start with the
 following, respectively:</p>
 <p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/service/misp-api/sample/&lt;method&gt;</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/service/zeromq-notifications/sample/&lt;zeromq-topic&gt;</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/event/zeromq-notifications/sample/&lt;zeromq-topic&gt;</span></code></p>
 <p>If serviceUniqueId is not set, request and event topic names would not
 include an id segment, for example:</p>
 <p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/service/misp-api/&lt;method&gt;</span></code></p>
-<p class="last"><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/service/zeromq-notifications/&lt;zeromq-topic&gt;</span></code></p>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/event/zeromq-notifications/&lt;zeromq-topic&gt;</span></code></p>
 </td>
 </tr>
 <tr class="row-even"><td>apiNames</td>
@@ -152,9 +152,13 @@ in the documentation for the pymisp.PyMISP class at
 </tr>
 <tr class="row-odd"><td>apiKey</td>
 <td>no</td>
-<td>The MISP server's API key. Note that this property is required if one or more <code class="docutils literal notranslate"><span class="pre">apiNames</span></code> is
-specified. The API key is accessible from the MISP web server UI. For more information, see
-<a class="reference external" href="https://misp.gitbooks.io/misp-book/content/automation/#automation-key">https://misp.gitbooks.io/misp-book/content/automation/#automation-key</a>.</td>
+<td><p class="first">The MISP server's API key. Note that this property is required if one or more <code class="docutils literal notranslate"><span class="pre">apiNames</span></code> is
+specified.</p>
+<p class="last">The API key is accessible from the MISP web server UI. Navigate to the <code class="docutils literal notranslate"><span class="pre">Automation</span></code> page under the
+<code class="docutils literal notranslate"><span class="pre">Event</span> <span class="pre">Actions</span></code> menu. Copy the value which follows the text <code class="docutils literal notranslate"><span class="pre">Your</span> <span class="pre">current</span> <span class="pre">key</span> <span class="pre">is:</span></code> into this
+property. For more information, see
+<a class="reference external" href="https://misp.gitbooks.io/misp-book/content/automation/#automation-key">https://misp.gitbooks.io/misp-book/content/automation/#automation-key</a>.</p>
+</td>
 </tr>
 <tr class="row-even"><td>apiPort</td>
 <td>no</td>
@@ -189,12 +193,28 @@ private key.</td>
 <td>no</td>
 <td><p class="first">The list of topics for MISP ZeroMQ messages which should be forwarded on to the DXL fabric.</p>
 <p>For example: <code class="docutils literal notranslate"><span class="pre">misp_json_event,misp_json_sighting</span></code></p>
-<p>With this example and the <code class="docutils literal notranslate"><span class="pre">serviceUniqueId</span></code> setting set to <code class="docutils literal notranslate"><span class="pre">sample</span></code>,  any ZeroMQ message with a
+<p>With this example and the <code class="docutils literal notranslate"><span class="pre">serviceUniqueId</span></code> setting set to <code class="docutils literal notranslate"><span class="pre">sample</span></code>, any ZeroMQ message with a
 topic of &quot;misp_json_event&quot; or &quot;misp_json_sighting&quot; would be forwarded as a DXL event with the
 following topics, respectively:</p>
-<p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/service/zeromq-notifications/sample/misp_json_event</span></code></p>
-<p class="last">The complete list of available MISP ZeroMQ messages is available at
+<p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/event/zeromq-notifications/sample/misp_json_event</span></code></p>
+<p>The complete list of available MISP ZeroMQ messages is available at
 <a class="reference external" href="https://misp.gitbooks.io/misp-book/content/misp-zmq/">https://misp.gitbooks.io/misp-book/content/misp-zmq/</a>.</p>
+<p>If you intend to use the ZeroMQ notification functionality with the OpenDXL MISP Python service, you
+will need to enable the ZeroMQ plugin in MISP. This step is needed to enable the DXL MISP service to be
+able to receive event notification messages from the MISP ZeroMQ server.</p>
+<p>From the MISP web server UI, do the following:</p>
+<ul class="simple">
+<li>Navigate to the <code class="docutils literal notranslate"><span class="pre">Server</span> <span class="pre">Settings</span> <span class="pre">&amp;</span> <span class="pre">Maintenance</span></code> page under the <code class="docutils literal notranslate"><span class="pre">Administration</span></code> menu.</li>
+<li>Select the <code class="docutils literal notranslate"><span class="pre">Plugin</span> <span class="pre">Settings</span></code> tab.</li>
+<li>Expand the <code class="docutils literal notranslate"><span class="pre">ZeroMQ</span></code> option in the plugin list.</li>
+<li>Set the <code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_enable</span></code> setting to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</li>
+<li>Set the <code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_notifications_enable</span></code> settings to <code class="docutils literal notranslate"><span class="pre">true</span></code> for the corresponding topics
+included in this setting. For example, for the topics <code class="docutils literal notranslate"><span class="pre">misp_json_event,misp_json_sighting</span></code>, the
+<code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_event_notifications_enable</span></code> and <code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_sighting_notifications_enable</span></code>
+settings would need to be set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</li>
+</ul>
+<p class="last">For more information, see the documentation for the
+<a class="reference external" href="https://misp.gitbooks.io/misp-book/misp-zmq/#misp-zeromq-configuration">MISP ZeroMQ configuration</a>.</p>
 </td>
 </tr>
 <tr class="row-even"><td>zeroMqPort</td>

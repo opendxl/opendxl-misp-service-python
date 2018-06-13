@@ -75,6 +75,24 @@ and launch an image from it with little to no additional configuration. For a
 more robust  setup, it would be better to refer to the upstream
 <a class="reference external" href="https://github.com/harvard-itsecurity/docker-misp">https://github.com/harvard-itsecurity/docker-misp</a> project.</p>
 </li>
+<li><p class="first">(Optional) MISP ZeroMQ notification configured.</p>
+<p>If you intend to use the ZeroMQ notification functionality with the OpenDXL
+MISP Python service, you will need to enable the ZeroMQ plugin in MISP.
+From the MISP web server UI, do the following:</p>
+<ul class="simple">
+<li>Navigate to the <code class="docutils literal notranslate"><span class="pre">Server</span> <span class="pre">Settings</span> <span class="pre">&amp;</span> <span class="pre">Maintenance</span></code> page under the
+<code class="docutils literal notranslate"><span class="pre">Administration</span></code> menu.</li>
+<li>Select the <code class="docutils literal notranslate"><span class="pre">Plugin</span> <span class="pre">Settings</span></code> tab.</li>
+<li>Expand the <code class="docutils literal notranslate"><span class="pre">ZeroMQ</span></code> option in the plugin list.</li>
+<li>Set the <code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_enable</span></code> setting to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</li>
+</ul>
+<p>This step is needed to enable the DXL MISP service to be able to receive
+notification messages from the MISP ZeroMQ server. For more information, see
+the documentation for the
+<a class="reference external" href="https://misp.gitbooks.io/misp-book/misp-zmq/#misp-zeromq-configuration">MISP ZeroMQ configuration</a>.
+and the <code class="docutils literal notranslate"><span class="pre">zeroMqNotificationTopics</span></code> setting in the
+<a class="reference internal" href="configuration.html#dxl-service-config-file-label"><span class="std std-ref">Service Configuration File</span></a> section.</p>
+</li>
 <li><p class="first">Python 2.7.9 or higher in the Python 2.x series or 3.4.0 or higher in the Python 3.x series installed within a Windows or Linux environment.</p>
 </li>
 </ul>

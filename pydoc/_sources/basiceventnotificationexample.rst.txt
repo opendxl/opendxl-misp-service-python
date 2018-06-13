@@ -21,12 +21,21 @@ Prerequisites
 * The samples configuration step has been completed (see :doc:`sampleconfig`).
 * The MISP DXL Python Service is running, using the ``sample`` configuration
   (see :doc:`running`).
-* Enable the ZeroMQ plugin and set the "Plugin_ZeroMQ_event_notification_enable"
-  setting to ``true`` through the MISP web server. For more information, see
+* Enable the MISP ZeroMQ plugin and ZeroMQ event notifications.
+
+  From the MISP web server UI, do the following:
+
+  * Navigate to the ``Server Settings & Maintenance`` page under the
+    ``Administration`` menu.
+  * Select the ``Plugin Settings`` tab.
+  * Expand the ``ZeroMQ`` option in the plugin list.
+  * Set the ``Plugin.ZeroMQ_enable`` setting to ``true``.
+  * Set the ``Plugin.ZeroMQ_event_notification_enable`` setting to ``true``.
+
+  This step is needed to enable the DXL MISP service to be able to receive event
+  notification messages from the MISP ZeroMQ server. For more information, see
   the documentation for the
   `MISP ZeroMQ configuration <https://misp.gitbooks.io/misp-book/misp-zmq/#misp-zeromq-configuration>`__.
-  This step is needed to enable the DXL MISP service to be able to receive
-  event notification messages from the MISP ZeroMQ server.
 
 Running
 *******
@@ -96,7 +105,7 @@ notifications for ``misp_json_event`` MISP ZeroMQ notifications:
 
     .. code-block:: python
 
-        EVENT_TOPIC = "/opendxl-misp/service/zeromq-notifications/misp_json_event"
+        EVENT_TOPIC = "/opendxl-misp/event/zeromq-notifications/misp_json_event"
 
         ...
 

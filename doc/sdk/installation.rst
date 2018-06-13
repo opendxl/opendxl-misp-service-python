@@ -26,6 +26,25 @@ Prerequisites
   more robust  setup, it would be better to refer to the upstream
   `<https://github.com/harvard-itsecurity/docker-misp>`_ project.
 
+* (Optional) MISP ZeroMQ notification configured.
+
+  If you intend to use the ZeroMQ notification functionality with the OpenDXL
+  MISP Python service, you will need to enable the ZeroMQ plugin in MISP.
+  From the MISP web server UI, do the following:
+
+  * Navigate to the ``Server Settings & Maintenance`` page under the
+    ``Administration`` menu.
+  * Select the ``Plugin Settings`` tab.
+  * Expand the ``ZeroMQ`` option in the plugin list.
+  * Set the ``Plugin.ZeroMQ_enable`` setting to ``true``.
+
+  This step is needed to enable the DXL MISP service to be able to receive
+  notification messages from the MISP ZeroMQ server. For more information, see
+  the documentation for the
+  `MISP ZeroMQ configuration <https://misp.gitbooks.io/misp-book/misp-zmq/#misp-zeromq-configuration>`__.
+  and the ``zeroMqNotificationTopics`` setting in the
+  :ref:`Service Configuration File <dxl_service_config_file_label>` section.
+
 * Python 2.7.9 or higher in the Python 2.x series or 3.4.0 or higher in the Python 3.x series installed within a Windows or Linux environment.
 
 Installation

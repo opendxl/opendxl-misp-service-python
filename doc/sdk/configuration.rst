@@ -110,7 +110,11 @@ MISP DXL Python Service (dxlmispservice.config)
         |                                  |          | https://media.readthedocs.org/pdf/pymisp/latest/pymisp.pdf.                                            |
         +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
         | apiKey                           | no       | The MISP server's API key. Note that this property is required if one or more ``apiNames`` is          |
-        |                                  |          | specified. The API key is accessible from the MISP web server UI. For more information, see            |
+        |                                  |          | specified.                                                                                             |
+        |                                  |          |                                                                                                        |
+        |                                  |          | The API key is accessible from the MISP web server UI. Navigate to the ``Automation`` page under the   |
+        |                                  |          | ``Event Actions`` menu. Copy the value which follows the text ``Your current key is:`` into this       |
+        |                                  |          | property. For more information, see                                                                    |
         |                                  |          | https://misp.gitbooks.io/misp-book/content/automation/#automation-key.                                 |
         +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
         | apiPort                          | no       | The MISP server's HTTP API port. Defaults to ``443``.                                                  |
@@ -136,7 +140,7 @@ MISP DXL Python Service (dxlmispservice.config)
         |                                  |          |                                                                                                        |
         |                                  |          | For example: ``misp_json_event,misp_json_sighting``                                                    |
         |                                  |          |                                                                                                        |
-        |                                  |          | With this example and the ``serviceUniqueId`` setting set to ``sample``,  any ZeroMQ message with a    |
+        |                                  |          | With this example and the ``serviceUniqueId`` setting set to ``sample``, any ZeroMQ message with a     |
         |                                  |          | topic of "misp_json_event" or "misp_json_sighting" would be forwarded as a DXL event with the          |
         |                                  |          | following topics, respectively:                                                                        |
         |                                  |          |                                                                                                        |
@@ -144,6 +148,24 @@ MISP DXL Python Service (dxlmispservice.config)
         |                                  |          |                                                                                                        |
         |                                  |          | The complete list of available MISP ZeroMQ messages is available at                                    |
         |                                  |          | https://misp.gitbooks.io/misp-book/content/misp-zmq/.                                                  |
+        |                                  |          |                                                                                                        |
+        |                                  |          | If you intend to use the ZeroMQ notification functionality with the OpenDXL MISP Python service, you   |
+        |                                  |          | will need to enable the ZeroMQ plugin in MISP. This step is needed to enable the DXL MISP service to be|
+        |                                  |          | able to receive event notification messages from the MISP ZeroMQ server.                               |
+        |                                  |          |                                                                                                        |
+        |                                  |          | From the MISP web server UI, do the following:                                                         |
+        |                                  |          |                                                                                                        |
+        |                                  |          | * Navigate to the ``Server Settings & Maintenance`` page under the ``Administration`` menu.            |
+        |                                  |          | * Select the ``Plugin Settings`` tab.                                                                  |
+        |                                  |          | * Expand the ``ZeroMQ`` option in the plugin list.                                                     |
+        |                                  |          | * Set the ``Plugin.ZeroMQ_enable`` setting to ``true``.                                                |
+        |                                  |          | * Set the ``Plugin.ZeroMQ_notifications_enable`` settings to ``true`` for the corresponding topics     |
+        |                                  |          |   included in this setting. For example, for the topics ``misp_json_event,misp_json_sighting``, the    |
+        |                                  |          |   ``Plugin.ZeroMQ_event_notifications_enable`` and ``Plugin.ZeroMQ_sighting_notifications_enable``     |
+        |                                  |          |   settings would need to be set to ``true``.                                                           |
+        |                                  |          |                                                                                                        |
+        |                                  |          | For more information, see the documentation for the                                                    |
+        |                                  |          | `MISP ZeroMQ configuration <https://misp.gitbooks.io/misp-book/misp-zmq/#misp-zeromq-configuration>`__.|
         +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
         | zeroMqPort                       | no       | The MISP server's ZeroMQ notification port. Defaults to ``50000``.                                     |
         +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+

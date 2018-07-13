@@ -10,11 +10,9 @@ import zmq
 
 if sys.version_info[0] > 2:
     import builtins  # pylint: disable=import-error, unused-import
-    from urllib.parse import quote_plus  # pylint: disable=no-name-in-module, import-error, unused-import
 else:
     import __builtin__  # pylint: disable=import-error
     builtins = __builtin__  # pylint: disable=invalid-name
-    from urllib import quote_plus  # pylint: disable=no-name-in-module, ungrouped-imports
 
 try:
     from configparser import ConfigParser

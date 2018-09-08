@@ -3,7 +3,6 @@ import logging
 import os
 import threading
 import zmq
-
 from pymisp import PyMISP
 
 from dxlbootstrap.app import Application
@@ -91,9 +90,12 @@ class MispService(Application):
         self._service_unique_id = None
         self._api_client = None
         self._api_names = ()
+        self._zeromq_context = None
         self._zeromq_notification_topics = None
         self._zeromq_poller = None
-        self._zeromq_socket = None
+        self._zeromq_misp_sub_socket = None
+        self._zeromq_shutdown_push_socket = None
+        self._zeromq_shutdown_pull_socket = None
         self._zeromq_thread = None
 
     @property
@@ -262,7 +264,7 @@ class MispService(Application):
             else:
                 cert = None
 
-            logger.info("Connecting to API URL: %s", api_url)
+            logger.info("Connecting to MISP API URL: %s", api_url)
             self._api_client = PyMISP(api_url, api_key,
                                       ssl=verify_certificate, cert=cert)
 
@@ -273,8 +275,8 @@ class MispService(Application):
             default_value=[])
 
         # Only validate MISP ZeroMQ configuration and connect to a MISP ZeroMQ
-        # server if at least one ZeroMQ topic was specified in the configuration
-        # file.
+        # server if at least one ZeroMQ topic was specified in the
+        # configuration file.
         if self._zeromq_notification_topics:
             zeromq_port = self._get_setting_from_config(
                 self._GENERAL_CONFIG_SECTION,
@@ -282,37 +284,99 @@ class MispService(Application):
                 default_value=self._DEFAULT_ZEROMQ_PORT,
                 return_type=int
             )
-            self._start_zeromq_listener(host, zeromq_port)
+            self._setup_zeromq_sockets(host, zeromq_port)
 
-    def _start_zeromq_listener(self, host, port):
+    @staticmethod
+    def _create_zeromq_socket(context, host, socket_type, description,
+                              port=None, topics=None, log_level=logging.INFO):
         """
-        Connect to the MISP ZeroMQ server, subscribe for notifications for
-        configured topics, and start a background thread which processes
-        notifications.
+        Create a ZeroMQ socket and, optionally, subscribe the socket to
+        one or more topics.
+
+        :param context: The ZeroMQ context.
+        :param str host: The host to which to connect.
+        :param str socket_type: The ZeroMQ socket type - zmq.PUB, zmq.SUB,
+            zmq.PULL, zmq.PUSH, etc.
+        :param description: Description of the ZeroMQ socket - used in
+            logging messages.
+        :param int port: The ZeroMQ port to which to connect. If `None` or `0`,
+            the socket will be bound to a random port.
+        :param list(str) topics: List of topics to which to subscribe the
+            socket.
+        :param int log_level: Level at which to log socket messages
+        :return: A tuple containing the ZeroMQ socket as the first element
+            and port to which the socket is attached as the second element.
+        :rtype: (socket, int)
+        """
+
+        socket = context.socket(socket_type)
+        base_socket_url = "tcp://{}".format(host)
+
+        if port:
+            socket_url = "{}:{}".format(base_socket_url, port)
+            logger.log(log_level, "Connecting to %s ZeroMQ URL: %s",
+                       description, socket_url)
+            socket.connect(socket_url)
+        else:
+            logger.log(log_level, "Binding to %s ZeroMQ URL: %s",
+                       description, base_socket_url)
+            port = socket.bind_to_random_port(base_socket_url)
+            socket_url = "{}:{}".format(base_socket_url, port)
+            logger.debug("Bound %s ZeroMQ URL: %s", description, socket_url)
+
+        socket.setsockopt(zmq.LINGER, 0)  # pylint: disable=no-member
+
+        if topics:
+            for topic in topics:
+                logger.log(log_level, "Subscribing to %s ZeroMQ topic: %s ...",
+                           description, topic)
+                socket.subscribe(topic)
+
+        return socket, port
+
+    def _setup_zeromq_sockets(self, host, port):
+        """
+        Connect to the ZeroMQ socket hosted by the MISP server, subscribe for
+        notifications for configured topics, and start a background thread
+        which polls for MISP notifications. Also setup a 'shutdown' ZeroMQ
+        socket to be used internally for terminating the MISP notification poll
+        at service shutdown time.
 
         :param str host: Host name / ip address of the MISP ZeroMQ server.
         :param int port: Port at which the MISP ZeroMQ server is hosted.
         """
-        context = zmq.Context()
-        self._zeromq_socket = context.socket(zmq.SUB) # pylint: disable=no-member
-        socket_url = "tcp://%s:%s" % (host, port)
-        logger.info("Connecting to ZeroMQ URL: %s", socket_url)
-        self._zeromq_socket.connect(socket_url)
-        for topic in self._zeromq_notification_topics:
-            logger.debug("Subscribing to ZeroMQ topic: %s", topic)
-            self._zeromq_socket.subscribe(topic)
-        logger.info("Waiting for ZeroMQ notifications: %s",
-                    self._zeromq_notification_topics)
+        self._zeromq_context = zmq.Context()
+
+        self._zeromq_misp_sub_socket, _ = self._create_zeromq_socket(
+            self._zeromq_context, host,
+            zmq.SUB,  # pylint: disable=no-member
+            "MISP", port=port, topics=self._zeromq_notification_topics)
+
+        shutdown_host = "127.0.0.1"
+
+        self._zeromq_shutdown_pull_socket, shutdown_port = \
+            self._create_zeromq_socket(
+                self._zeromq_context, shutdown_host,
+                zmq.PULL,  # pylint: disable=no-member
+                "Shutdown PULL", log_level=logging.DEBUG)
+
+        self._zeromq_shutdown_push_socket, _ = self._create_zeromq_socket(
+            self._zeromq_context, shutdown_host,
+            zmq.PUSH,  # pylint: disable=no-member
+            "Shutdown PUSH", port=shutdown_port, log_level=logging.DEBUG)
 
         self._zeromq_poller = zmq.Poller()
-        self._zeromq_poller.register(self._zeromq_socket, zmq.POLLIN)
+        self._zeromq_poller.register(self._zeromq_misp_sub_socket, zmq.POLLIN)
+        self._zeromq_poller.register(self._zeromq_shutdown_pull_socket,
+                                     zmq.POLLIN)
+
         zeromq_thread = threading.Thread(
-            target=self._process_zeromq_messages)
+            target=self._process_zeromq_misp_messages)
         zeromq_thread.daemon = True
         self._zeromq_thread = zeromq_thread
         self._zeromq_thread.start()
 
-    def _process_zeromq_messages(self):
+    def _process_zeromq_misp_messages(self):
         """
         Poll for MISP ZeroMQ notifications. On receipt of a notification,
         send a corresponding event to the DXL fabric.
@@ -320,13 +384,13 @@ class MispService(Application):
         while not self.__destroyed:
             try:
                 socks = dict(self._zeromq_poller.poll(timeout=None))
-            # A ZMQError would be raised if the socket is shut down while
+            # A ZMQError could be raised if the socket is shut down while
             # blocked in a poll.
             except zmq.ZMQError:
                 socks = {}
-            if self._zeromq_socket in socks and \
-                socks[self._zeromq_socket] == zmq.POLLIN:
-                message = self._zeromq_socket.recv_string()
+            if self._zeromq_misp_sub_socket in socks and \
+                    socks[self._zeromq_misp_sub_socket] == zmq.POLLIN:
+                message = self._zeromq_misp_sub_socket.recv_string()
                 topic, _, payload = message.partition(" ")
                 logger.debug("Received notification for %s", topic)
                 full_event_topic = "{}{}/{}".format(
@@ -340,23 +404,54 @@ class MispService(Application):
                 event.payload = payload
                 self.client.send_event(event)
 
+    @staticmethod
+    def _close_zeromq_socket(socket, description):
+        """
+        Close the supplied ZeroMQ socket.
+
+        :param socket: The ZeroMQ socket to close.
+        :param description: Description of the ZeroMQ socket - used in
+            logging messages.
+        """
+        if socket:
+            logger.debug("Closing ZeroMQ %s socket ...", description)
+            socket.close()
+            logger.debug("ZeroMQ %s socket closed", description)
+
     def destroy(self):
         """
         Destroys the application (disconnects from fabric and frees resources
-        allocated to handle MISP ZeroMQ notifications)
+        allocated to handle ZeroMQ notifications)
         """
         super(MispService, self).destroy()
         with self.__lock:
             if not self.__destroyed:
                 self.__destroyed = True
-                if self._zeromq_socket:
-                    logger.debug("Closing ZeroMQ socket ...")
-                    self._zeromq_socket.close()
+                self._close_zeromq_socket(self._zeromq_misp_sub_socket, "MISP")
+                if self._zeromq_shutdown_push_socket:
+                    # Send message to the Shutdown PULL socket to interrupt
+                    # the ZeroMQ polling operation
+                    self._zeromq_shutdown_push_socket.send_string("interrupt")
                 if self._zeromq_thread:
                     logger.debug(
                         "Waiting for ZeroMQ message thread to terminate ...")
                     self._zeromq_thread.join()
                     logger.debug("ZeroMQ message thread terminated")
+                self._close_zeromq_socket(self._zeromq_shutdown_push_socket,
+                                          "Shutdown PUSH")
+                self._close_zeromq_socket(self._zeromq_shutdown_pull_socket,
+                                          "Shutdown PULL")
+                if self._zeromq_poller:
+                    if self._zeromq_misp_sub_socket:
+                        self._zeromq_poller.unregister(
+                            self._zeromq_misp_sub_socket)
+                    if self._zeromq_shutdown_pull_socket:
+                        self._zeromq_poller.unregister(
+                            self._zeromq_shutdown_pull_socket)
+                if self._zeromq_context:
+                    logger.debug("Terminating ZeroMQ context...")
+                    self._zeromq_context.term()
+                    logger.debug("ZeroMQ context terminated")
 
     def on_dxl_connect(self):
         """

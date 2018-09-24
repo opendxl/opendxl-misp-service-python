@@ -67,8 +67,8 @@ class Sample(unittest.TestCase):
         return mock_print
 
     def run_sample(self, sample_file, add_request_mocks_fn=None):
-        context = zmq.Context()
-        with dxlmispservice.MispService("sample") as app:
+        with zmq.Context() as context, \
+                dxlmispservice.MispService("sample") as app:
             config = ConfigParser()
             config.read(app._app_config_path)
 
@@ -103,6 +103,7 @@ class Sample(unittest.TestCase):
                             zmq.PUB) as zmq_socket:  # pylint: disable=no-member
                     zmq_port = zmq_socket.bind_to_random_port("tcp://" +
                                                               self._TEST_HOSTNAME)
+                    zmq_socket.setsockopt(zmq.LINGER, 0)  # pylint: disable=no-member
 
                     config.set(
                         dxlmispservice.MispService._GENERAL_CONFIG_SECTION,

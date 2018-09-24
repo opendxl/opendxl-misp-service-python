@@ -131,9 +131,9 @@ The following Docker commands are useful once the container has been created.
                 Running application ...
                 On 'run' callback.
                 On 'load configuration' callback.
-                Connecting to API URL: https://172.17.0.3:443
-                Connecting to zeromq URL: tcp://172.17.0.3:50000
-                Waiting for zeromq notifications: ['misp_json_event']
+                Connecting to MISP API URL: https://172.17.0.3:443
+                Connecting to MISP ZeroMQ URL: tcp://172.17.0.3:50000
+                Subscribing to MISP ZeroMQ topic: misp_json_event ...
                 Incoming message configuration: queueSize=1000, threadCount=10
                 Message callback configuration: queueSize=1000, threadCount=10
                 Attempting to connect to DXL fabric ...

@@ -364,7 +364,7 @@ class Sample(unittest.TestCase):
                 "distribution": "3",
                 "info": "OpenDXL MISP event notification example",
                 "analysis": "1",
-                "published": False,
+                "published": True,
                 "threat_level_id": "3"
             }}
 
@@ -374,7 +374,7 @@ class Sample(unittest.TestCase):
                 event_detail_with_id = request.json()
                 event_detail_with_id["Event"]["id"] = mock_event_id
                 event_json_with_id = json.dumps(event_detail_with_id)
-                zmq_socket.send_string('misp_json_event ' + event_json_with_id)
+                zmq_socket.send_string('misp_json ' + event_json_with_id)
                 return event_json_with_id
 
             return new_event_callback

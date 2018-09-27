@@ -18,7 +18,7 @@ from common import *
 logging.getLogger().setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
 
-EVENT_TOPIC = "/opendxl-misp/event/zeromq-notifications/misp_json_event"
+EVENT_TOPIC = "/opendxl-misp/event/zeromq-notifications/misp_json"
 
 # Create DXL configuration from file
 config = DxlClientConfig.create_dxl_config_from_file(CONFIG_FILE)
@@ -58,7 +58,8 @@ with DxlClient(config) as client:
         "distribution": 3,
         "info": "OpenDXL MISP event notification example",
         "analysis": 1,
-        "threat_level_id": 3
+        "threat_level_id": 3,
+        "published": True
     })
 
     print("Create new MISP event and wait for notification via ZeroMQ ...")

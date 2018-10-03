@@ -91,7 +91,7 @@ class MispService(Application):
         self._api_client = None
         self._api_names = ()
         self._zeromq_context = None
-        self._zeromq_notification_topics = None
+        self._zeromq_notification_topics = set()
         self._zeromq_poller = None
         self._zeromq_misp_sub_socket = None
         self._zeromq_shutdown_push_socket = None
@@ -149,6 +149,7 @@ class MispService(Application):
         if config.has_option(section, setting):
             getter_methods = {str: config.get,
                               list: config.get,
+                              set: config.get,
                               bool: config.getboolean,
                               int: config.getint,
                               float: config.getfloat}
@@ -164,7 +165,7 @@ class MispService(Application):
                     raise ValueError(
                         "Required setting {} in section {} is empty".format(
                             setting, section))
-            elif return_type == list:
+            elif return_type in (list, set):
                 return_value = [item.strip()
                                 for item in return_value.split(",")]
                 if len(return_value) is 1 and len(return_value[0]) is 0 \
@@ -172,6 +173,8 @@ class MispService(Application):
                     raise ValueError(
                         "Required setting {} in section {} is empty".format(
                             setting, section))
+                if return_type == set:
+                    return_value = set(return_value)
         elif raise_exception_if_missing:
             raise ValueError(
                 "Required setting {} not found in {} section".format(setting,
@@ -271,8 +274,8 @@ class MispService(Application):
         self._zeromq_notification_topics = self._get_setting_from_config(
             self._GENERAL_CONFIG_SECTION,
             self._GENERAL_ZEROMQ_NOTIFICATION_TOPICS_CONFIG_PROP,
-            return_type=list,
-            default_value=[])
+            return_type=set,
+            default_value=set())
 
         # Only validate MISP ZeroMQ configuration and connect to a MISP ZeroMQ
         # server if at least one ZeroMQ topic was specified in the
@@ -327,7 +330,7 @@ class MispService(Application):
         socket.setsockopt(zmq.LINGER, 0)  # pylint: disable=no-member
 
         if topics:
-            for topic in topics:
+            for topic in sorted(topics):
                 logger.log(log_level, "Subscribing to %s ZeroMQ topic: %s ...",
                            description, topic)
                 socket.subscribe(topic)
@@ -393,16 +396,28 @@ class MispService(Application):
                 message = self._zeromq_misp_sub_socket.recv_string()
                 topic, _, payload = message.partition(" ")
                 logger.debug("Received notification for %s", topic)
-                full_event_topic = "{}{}/{}".format(
-                    self._ZEROMQ_NOTIFICATIONS_EVENT_TOPIC,
-                    "/{}".format(self._service_unique_id)
-                    if self._service_unique_id else "",
-                    topic)
-                event = Event(full_event_topic)
-                logger.debug("Forwarding notification to %s ...",
-                             full_event_topic)
-                event.payload = payload
-                self.client.send_event(event)
+
+                # ZeroMQ will deliver notifications for any topic which starts
+                # with the subscribed topic name. Events should only be
+                # forwarded only to the DXL fabric for messages whose topic
+                # exactly matches an entry in the DXL service configuration
+                # file. For example, if the DXL service configuration file
+                # includes only the topic "misp_json", the ZeroMQ socket would
+                # provide messages with a topic of either "misp_json" or
+                # "misp_json_self" to the ZeroMQ subscriber. Only messages with
+                # a topic of "misp_json" (not "misp_json_self") should be
+                # forwarded to the DXL fabric.
+                if topic in self._zeromq_notification_topics:
+                    full_event_topic = "{}{}/{}".format(
+                        self._ZEROMQ_NOTIFICATIONS_EVENT_TOPIC,
+                        "/{}".format(self._service_unique_id)
+                        if self._service_unique_id else "",
+                        topic)
+                    event = Event(full_event_topic)
+                    logger.debug("Forwarding notification to %s ...",
+                                 full_event_topic)
+                    event.payload = payload
+                    self.client.send_event(event)
 
     @staticmethod
     def _close_zeromq_socket(socket, description):

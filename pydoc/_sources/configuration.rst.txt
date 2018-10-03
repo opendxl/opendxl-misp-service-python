@@ -59,7 +59,7 @@ MISP DXL Python Service (dxlmispservice.config)
             apiNames=new_event,search,add_internal_comment,tag,sighting
             verifyCertificate=yes
             verifyCertBundle=mispCA.crt
-            zeroMqNotificationTopics=misp_json_event,misp_json_sighting
+            zeroMqNotificationTopics=misp_json,misp_json_sighting
 
     **General**
 
@@ -138,13 +138,15 @@ MISP DXL Python Service (dxlmispservice.config)
         +----------------------------------+----------+--------------------------------------------------------------------------------------------------------+
         | zeroMqNotificationTopics         | no       | The list of topics for MISP ZeroMQ messages which should be forwarded on to the DXL fabric.            |
         |                                  |          |                                                                                                        |
-        |                                  |          | For example: ``misp_json_event,misp_json_sighting``                                                    |
+        |                                  |          | For example: ``misp_json,misp_json_sighting``                                                          |
         |                                  |          |                                                                                                        |
         |                                  |          | With this example and the ``serviceUniqueId`` setting set to ``sample``, any ZeroMQ message with a     |
-        |                                  |          | topic of "misp_json_event" or "misp_json_sighting" would be forwarded as a DXL event with the          |
+        |                                  |          | topic of "misp_json" or "misp_json_sighting" would be forwarded as a DXL event with the                |
         |                                  |          | following topics, respectively:                                                                        |
         |                                  |          |                                                                                                        |
-        |                                  |          | ``/opendxl-misp/event/zeromq-notifications/sample/misp_json_event``                                    |
+        |                                  |          | ``/opendxl-misp/event/zeromq-notifications/sample/misp_json``                                          |
+        |                                  |          |                                                                                                        |
+        |                                  |          | ``/opendxl-misp/event/zeromq-notifications/sample/misp_json_sighting``                                 |
         |                                  |          |                                                                                                        |
         |                                  |          | The complete list of available MISP ZeroMQ messages is available at                                    |
         |                                  |          | https://misp.gitbooks.io/misp-book/content/misp-zmq/.                                                  |
@@ -160,7 +162,7 @@ MISP DXL Python Service (dxlmispservice.config)
         |                                  |          | * Expand the ``ZeroMQ`` option in the plugin list.                                                     |
         |                                  |          | * Set the ``Plugin.ZeroMQ_enable`` setting to ``true``.                                                |
         |                                  |          | * Set the ``Plugin.ZeroMQ_notifications_enable`` settings to ``true`` for the corresponding topics     |
-        |                                  |          |   included in this setting. For example, for the topics ``misp_json_event,misp_json_sighting``, the    |
+        |                                  |          |   included in this setting. For example, for the topics ``misp_json,misp_json_sighting``, the          |
         |                                  |          |   ``Plugin.ZeroMQ_event_notifications_enable`` and ``Plugin.ZeroMQ_sighting_notifications_enable``     |
         |                                  |          |   settings would need to be set to ``true``.                                                           |
         |                                  |          |                                                                                                        |

@@ -45,7 +45,7 @@ script as follows:
 
     .. code-block:: shell
 
-        python sample/basic/basic_event_notification.py
+        python sample/basic/basic_event_notification_example.py
 
 The output should appear similar to the following:
 
@@ -55,32 +55,40 @@ The output should appear similar to the following:
         Received event:
         {
             "Event": {
+                "Attribute": [],
+                "Galaxy": [],
+                "Object": [],
+                "Org": {
+                    "id": "1",
+                    "name": "ORGNAME",
+                    "uuid": "5ad76731-5170-4bda-88fe-0179ac110002"
+                },
+                "Orgc": {
+                    "id": "1",
+                    "name": "ORGNAME",
+                    "uuid": "5ad76731-5170-4bda-88fe-0179ac110002"
+                },
+                "RelatedEvent": [],
+                "ShadowAttribute": [],
                 "analysis": "1",
                 "attribute_count": "0",
-                "date": "2018-04-09",
+                "date": "2018-09-27",
                 "disable_correlation": false,
                 "distribution": "3",
-                "id": "172",
+                "extends_uuid": "",
+                "id": "175",
                 "info": "OpenDXL MISP event notification example",
                 "locked": false,
                 "org_id": "1",
                 "orgc_id": "1",
                 "proposal_email_lock": false,
-                "publish_timestamp": "0",
-                "published": false,
+                "publish_timestamp": "1538008974",
+                "published": true,
                 "sharing_group_id": "0",
                 "threat_level_id": "3",
-                "timestamp": "1523288047",
-                "user_id": "1",
-                "uuid": "5acb87ef-8c9c-4347-b0c1-196cac110002"
-            },
-            "EventTag": [],
-            "Orgc": {
-                "id": "1",
-                "name": "ORGNAME",
-                "uuid": "5ac3c55a-41a4-4294-adf3-00f8ac110003"
-            },
-            "action": "add"
+                "timestamp": "1538008973",
+                "uuid": "5bac278d-b910-4912-9b3f-03f7ac110005"
+            }
         }
 
 Details
@@ -101,11 +109,11 @@ For more information on the configuration, see the
 The code for the sample is broken into two main sections.
 
 The first section is responsible for registering a callback to receive
-notifications for ``misp_json_event`` MISP ZeroMQ notifications:
+notifications for ``misp_json`` MISP ZeroMQ notifications:
 
     .. code-block:: python
 
-        EVENT_TOPIC = "/opendxl-misp/event/zeromq-notifications/misp_json_event"
+        EVENT_TOPIC = "/opendxl-misp/event/zeromq-notifications/misp_json"
 
         ...
 
@@ -152,7 +160,8 @@ MISP ZeroMQ event notification.
             "distribution": 3,
             "info": "OpenDXL MISP event notification example",
             "analysis": 1,
-            "threat_level_id": 3
+            "threat_level_id": 3,
+            "published": True
         })
 
         print("Create new MISP event and wait for notification via ZeroMQ ...")

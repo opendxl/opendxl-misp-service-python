@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Configuration &#8212; MISP DXL Python Service 0.1.1 documentation</title>
+    <title>Configuration &#8212; MISP DXL Python Service 0.1.2 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">MISP DXL Python Service 0.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">MISP DXL Python Service 0.1.2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -95,7 +95,7 @@ page for more information.</p>
 <span class="na">apiNames</span><span class="o">=</span><span class="s">new_event,search,add_internal_comment,tag,sighting</span>
 <span class="na">verifyCertificate</span><span class="o">=</span><span class="s">yes</span>
 <span class="na">verifyCertBundle</span><span class="o">=</span><span class="s">mispCA.crt</span>
-<span class="na">zeroMqNotificationTopics</span><span class="o">=</span><span class="s">misp_json_event,misp_json_sighting</span>
+<span class="na">zeroMqNotificationTopics</span><span class="o">=</span><span class="s">misp_json,misp_json_sighting</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -195,11 +195,12 @@ private key.</td>
 <tr class="row-odd"><td>zeroMqNotificationTopics</td>
 <td>no</td>
 <td><p class="first">The list of topics for MISP ZeroMQ messages which should be forwarded on to the DXL fabric.</p>
-<p>For example: <code class="docutils literal notranslate"><span class="pre">misp_json_event,misp_json_sighting</span></code></p>
+<p>For example: <code class="docutils literal notranslate"><span class="pre">misp_json,misp_json_sighting</span></code></p>
 <p>With this example and the <code class="docutils literal notranslate"><span class="pre">serviceUniqueId</span></code> setting set to <code class="docutils literal notranslate"><span class="pre">sample</span></code>, any ZeroMQ message with a
-topic of &quot;misp_json_event&quot; or &quot;misp_json_sighting&quot; would be forwarded as a DXL event with the
+topic of &quot;misp_json&quot; or &quot;misp_json_sighting&quot; would be forwarded as a DXL event with the
 following topics, respectively:</p>
-<p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/event/zeromq-notifications/sample/misp_json_event</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/event/zeromq-notifications/sample/misp_json</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">/opendxl-misp/event/zeromq-notifications/sample/misp_json_sighting</span></code></p>
 <p>The complete list of available MISP ZeroMQ messages is available at
 <a class="reference external" href="https://misp.gitbooks.io/misp-book/content/misp-zmq/">https://misp.gitbooks.io/misp-book/content/misp-zmq/</a>.</p>
 <p>If you intend to use the ZeroMQ notification functionality with the OpenDXL MISP Python service, you
@@ -212,7 +213,7 @@ able to receive event notification messages from the MISP ZeroMQ server.</p>
 <li>Expand the <code class="docutils literal notranslate"><span class="pre">ZeroMQ</span></code> option in the plugin list.</li>
 <li>Set the <code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_enable</span></code> setting to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</li>
 <li>Set the <code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_notifications_enable</span></code> settings to <code class="docutils literal notranslate"><span class="pre">true</span></code> for the corresponding topics
-included in this setting. For example, for the topics <code class="docutils literal notranslate"><span class="pre">misp_json_event,misp_json_sighting</span></code>, the
+included in this setting. For example, for the topics <code class="docutils literal notranslate"><span class="pre">misp_json,misp_json_sighting</span></code>, the
 <code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_event_notifications_enable</span></code> and <code class="docutils literal notranslate"><span class="pre">Plugin.ZeroMQ_sighting_notifications_enable</span></code>
 settings would need to be set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</li>
 </ul>
@@ -296,7 +297,7 @@ settings would need to be set to <code class="docutils literal notranslate"><spa
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">MISP DXL Python Service 0.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">MISP DXL Python Service 0.1.2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

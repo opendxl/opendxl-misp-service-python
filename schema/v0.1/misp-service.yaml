@@ -35,12 +35,12 @@ services:
         $ref: '#/requests/~1opendxl-misp~1service~1misp-api~1<User-Defined-Topic(s)>'
 events:
   /opendxl-misp/event/zeromq-notifications/<User-Defined-Topic(s)>:
-    description: 'The OpenDXL MISP service can be configured with a set of topics for use with forwarding MISP ZeroMQ messages as DXL Events to be sent to the DXL fabric. For more information please see the MISP DXL Python Service''s <a href=''https://github.com/opendxl/opendxl-misp-service-python/blob/master/config/dxlmispservice.config''>configuration file</a>.'
+    description: 'The OpenDXL MISP service can be configured with a set of topics for use with forwarding MISP ZeroMQ messages as DXL Events to be sent to the DXL fabric.'
     externalDocs:
-      description: 'MISP DXL Python Service: Configuration'
+      description: 'MISP DXL Python Service SDK Documentation: Configuration'
       url: 'https://opendxl.github.io/opendxl-misp-service-python/pydoc/configuration.html'
     payload:
-      description: 'Refer to the <a href=''https://misp.gitbooks.io/misp-book/content/misp-zmq/''>MISP ZeroMQ documentation</a> for information on the event(s) you are configuring the MISP DXL Service to forward to the DXL fabric. <p>Also see the OpenDXL MISP Service SDK Documentation''s <a href=''https://opendxl.github.io/opendxl-misp-service-python/pydoc/basiceventnotificationexample.html''>Basic Event Notification Sample</a>.'
+      description: 'Refer to the <a href=''https://misp.gitbooks.io/misp-book/content/misp-zmq/''>MISP ZeroMQ documentation</a> for information on the event(s) to which you are subcribing.'
       example:
         Event:
           Attribute: []
@@ -78,7 +78,7 @@ requests:
   /opendxl-misp/service/misp-api/<User-Defined-Topic(s)>:
     description: 'The OpenDXL MISP service can be configured with a set of DXL service topics corresponding to MISP API methods. For more information please see the MISP DXL Python Service''s <a href=''https://github.com/opendxl/opendxl-misp-service-python/blob/master/config/dxlmispservice.config''>configuration file</a>.'
     externalDocs:
-      description: 'MISP DXL Python Service: Service Methods'
+      description: 'MISP DXL Python Service SDK Documentation: Service Methods'
       url: 'https://opendxl.github.io/opendxl-misp-service-python/pydoc/servicemethods.html'
     payload:
       description: 'Refer to the <a href=''https://misp.gitbooks.io/misp-book/content/automation/#automation-api''>MISP API documentation</a> for information on the service method(s) you are configuring the MISP DXL Service to forward to the MISP Automation API. <p>Also see the OpenDXL MISP Service SDK Documentation examples below for a detailed walkthrough of configuring a service method, sending a request, and receiving a response:<p><ul><li><a href=''https://opendxl.github.io/opendxl-misp-service-python/pydoc/basicneweventexample.html''>Basic New Event Sample</a></li><li><a href=''https://opendxl.github.io/opendxl-misp-service-python/pydoc/basicupdateeventexample.html''>Basic Update Event Sample</a></li></ul>'
@@ -88,7 +88,7 @@ requests:
         analysis: 1
         threat_level_id: 3
     response:
-      description: 'The contents of the DXL response payload are provided as a JSON string form of the response provided by the MISP API. Please see the <a href=''https://misp.gitbooks.io/misp-book/content/automation/#automation-api''>MISP Automation API deference</a> for further details.'
+      description: 'The contents of the DXL response payload are provided as a JSON string form of the response provided by the MISP API. Please see the <a href=''https://misp.gitbooks.io/misp-book/content/automation/#automation-api''>MISP Automation API reference</a> for further details.'
       payload:
         example:
           Event:

@@ -3,7 +3,6 @@
 [![Latest PyPI Version](https://img.shields.io/pypi/v/dxlmispservice.svg)](https://pypi.python.org/pypi/dxlmispservice)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build Status](https://travis-ci.org/opendxl/opendxl-misp-service-python.png?branch=master)](https://travis-ci.org/opendxl/opendxl-misp-service-python)
-[![Docker Build Status](https://img.shields.io/docker/build/opendxl/opendxl-misp-service-python.svg)](https://hub.docker.com/r/opendxl/opendxl-misp-service-python/)
 
 
 ## Overview

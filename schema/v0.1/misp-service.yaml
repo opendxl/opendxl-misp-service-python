@@ -1,0 +1,132 @@
+openDxlApi: '0.1'
+info:
+  title: 'MISP DXL Service'
+  version: 0.1.0
+  description: 'The OpenDXL MISP service exposes access to the <a href=''https://misp.gitbooks.io/misp-book/content/automation/#automation-api''>MISP REST APIs</a> via the <a href=''http://www.mcafee.com/us/solutions/data-exchange-layer.aspx''>Data Exchange Layer</a> (DXL) fabric. The service also provides support for forwarding <a href=''https://misp.gitbooks.io/misp-book/content/misp-zmq/''>MISP ZeroMQ</a> message notifications to the DXL fabric.'
+  contact:
+    name: OpenDXL
+    url: 'https://www.opendxl.com'
+solutions:
+  'MISP DXL Service':
+    info:
+      title: 'MISP DXL Service'
+      version: 0.1.2
+      description: 'The MISP DXL Service.'
+    externalDocs:
+      description: 'MISP REST API Reference'
+      url: 'https://misp.gitbooks.io/misp-book/content/automation/#automation-api'
+    services:
+      -
+        $ref: '#/services/MISP DXL Python Service'
+    events:
+      -
+        $ref: '#/events/~1opendxl-misp~1event~1zeromq-notifications~1<User-Defined-Topic(s)>'
+services:
+  'MISP DXL Python Service':
+    info:
+      title: 'MISP DXL Python Service'
+      version: 0.1.2
+      description: 'The OpenDXL MISP service exposes access to the <a href=''https://misp.gitbooks.io/misp-book/content/automation/#automation-api''>MISP REST APIs</a> via the <a href=''http://www.mcafee.com/us/solutions/data-exchange-layer.aspx''>Data Exchange Layer</a> (DXL) fabric. The service also provides support for forwarding <a href=''https://misp.gitbooks.io/misp-book/content/misp-zmq/''>MISP ZeroMQ</a> message notifications to the DXL fabric.'
+    externalDocs:
+      description: 'MISP DXL Python Service (GitHub)'
+      url: 'https://github.com/opendxl/opendxl-misp-service-python'
+    requests:
+      -
+        $ref: '#/requests/~1opendxl-misp~1service~1misp-api~1<User-Defined-Topic(s)>'
+events:
+  /opendxl-misp/event/zeromq-notifications/<User-Defined-Topic(s)>:
+    description: 'The OpenDXL MISP service can be configured with a set of topics for use with forwarding MISP ZeroMQ messages as DXL Events to be sent to the DXL fabric.'
+    externalDocs:
+      description: 'MISP DXL Python Service SDK Documentation: Configuration'
+      url: 'https://opendxl.github.io/opendxl-misp-service-python/pydoc/configuration.html'
+    payload:
+      description: 'Refer to the <a href=''https://misp.gitbooks.io/misp-book/content/misp-zmq/''>MISP ZeroMQ documentation</a> for information on the event(s) to which you are subcribing.'
+      example:
+        Event:
+          Attribute: []
+          Galaxy: []
+          Object: []
+          Org:
+            id: '1'
+            name: ORGNAME
+            uuid: 5ad76731-5170-4bda-88fe-0179ac110002
+          Orgc:
+            id: '1'
+            name: ORGNAME
+            uuid: 5ad76731-5170-4bda-88fe-0179ac110002
+          RelatedEvent: []
+          ShadowAttribute: []
+          analysis: '1'
+          attribute_count: '0'
+          date: '2018-09-27'
+          disable_correlation: false
+          distribution: '3'
+          extends_uuid: ""
+          id: '175'
+          info: 'OpenDXL MISP event notification example'
+          locked: false
+          org_id: '1'
+          orgc_id: '1'
+          proposal_email_lock: false
+          publish_timestamp: '1538008974'
+          published: true
+          sharing_group_id: '0'
+          threat_level_id: '3'
+          timestamp: '1538008973'
+          uuid: 5bac278d-b910-4912-9b3f-03f7ac110005
+requests:
+  /opendxl-misp/service/misp-api/<User-Defined-Topic(s)>:
+    description: 'The OpenDXL MISP service can be configured with a set of DXL service topics corresponding to MISP API methods. For more information please see the MISP DXL Python Service''s <a href=''https://github.com/opendxl/opendxl-misp-service-python/blob/master/config/dxlmispservice.config''>configuration file</a>.'
+    externalDocs:
+      description: 'MISP DXL Python Service SDK Documentation: Service Methods'
+      url: 'https://opendxl.github.io/opendxl-misp-service-python/pydoc/servicemethods.html'
+    payload:
+      description: 'Refer to the <a href=''https://misp.gitbooks.io/misp-book/content/automation/#automation-api''>MISP API documentation</a> for information on the service method(s) you are configuring the MISP DXL Service to forward to the MISP Automation API. <p>Also see the OpenDXL MISP Service SDK Documentation examples below for a detailed walkthrough of configuring a service method, sending a request, and receiving a response:<p><ul><li><a href=''https://opendxl.github.io/opendxl-misp-service-python/pydoc/basicneweventexample.html''>Basic New Event Sample</a></li><li><a href=''https://opendxl.github.io/opendxl-misp-service-python/pydoc/basicupdateeventexample.html''>Basic Update Event Sample</a></li></ul>'
+      example:
+        distribution: 3
+        info: 'OpenDXL MISP new event example'
+        analysis: 1
+        threat_level_id: 3
+    response:
+      description: 'The contents of the DXL response payload are provided as a JSON string form of the response provided by the MISP API. Please see the <a href=''https://misp.gitbooks.io/misp-book/content/automation/#automation-api''>MISP Automation API reference</a> for further details.'
+      payload:
+        example:
+          Event:
+            Attribute: []
+            Galaxy: []
+            Object: []
+            Org:
+              id: '1'
+              name: ORGNAME
+              uuid: 5ac3c55a-41a4-4294-adf3-00f8ac110003
+            Orgc:
+              id: '1'
+              name: ORGNAME
+              uuid: 5ac3c55a-41a4-4294-adf3-00f8ac110003
+            RelatedEvent: []
+            ShadowAttribute: []
+            analysis: '1'
+            attribute_count: '0'
+            date: '2018-04-09'
+            disable_correlation: false
+            distribution: '3'
+            event_creator_email: admin@admin.test
+            id: '169'
+            info: 'OpenDXL MISP new event example'
+            locked: false
+            org_id: '1'
+            orgc_id: '1'
+            proposal_email_lock: false
+            publish_timestamp: '0'
+            published: false
+            sharing_group_id: '0'
+            threat_level_id: '3'
+            timestamp: '1523287869'
+            uuid: 5acb873d-a914-4f9f-92b9-196cac110002
+    errorResponses:
+      '0':
+        payload:
+          $ref: '#/definitions/Error Response Object'
+definitions:
+  'Error Response Object':
+    example: 'Error handling request: An Internal Error has occurred.'

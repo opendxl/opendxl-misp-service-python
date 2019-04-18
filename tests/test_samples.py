@@ -168,7 +168,7 @@ class Sample(unittest.TestCase):
             req_mock.post(self.get_api_endpoint("events"),
                           text=json.dumps(event_detail_with_id))
             event_response_data = {"response": event_detail_with_id}
-            req_mock.post(self.get_api_endpoint("events/restSearch/download"),
+            req_mock.post(self.get_api_endpoint("events/restSearch"),
                           text=json.dumps(event_response_data))
 
         mock_print, req_mock = self.run_sample(
@@ -186,7 +186,7 @@ class Sample(unittest.TestCase):
             search_request = req_mock.request_history[request_count - 1]
             self.assertEqual(self._TEST_API_KEY,
                              search_request.headers["Authorization"])
-            self.assertEqual({"eventid": mock_event_id}, search_request.json())
+            self.assertEqual(mock_event_id, search_request.json()["eventid"])
 
         mock_print.assert_any_call(
             StringMatches(
@@ -197,7 +197,7 @@ class Sample(unittest.TestCase):
         mock_print.assert_any_call(
             StringMatches(
                 self.expected_print_output(
-                    "Response to the search request for the new MISP event:.*",
+                    "Response to the search request for the new MISP event:",
                     expected_event_detail
                 )
             )
@@ -269,8 +269,8 @@ class Sample(unittest.TestCase):
             req_mock.post(self.get_api_endpoint("tags/attachTagToObject"),
                           text='{"name": "Tag ' + expected_tag_name + '"}')
             req_mock.post(self.get_api_endpoint("sightings/add/"),
-                          text='{"message": "1 sighting successfuly added"}')
-            req_mock.post(self.get_api_endpoint("events/restSearch/download"),
+                          text='{"message": "Sighting added"}')
+            req_mock.post(self.get_api_endpoint("events/restSearch"),
                           text=json.dumps(expected_event_after_update))
 
         mock_print, req_mock = self.run_sample(
@@ -320,7 +320,7 @@ class Sample(unittest.TestCase):
             search_request = req_mock.request_history[request_count - 1]
             self.assertEqual(self._TEST_API_KEY,
                              search_request.headers["Authorization"])
-            self.assertEqual({"eventid": mock_event_id}, search_request.json())
+            self.assertEqual(mock_event_id, search_request.json()["eventid"])
 
         mock_print.assert_any_call(
             StringMatches(
@@ -344,7 +344,7 @@ class Sample(unittest.TestCase):
         mock_print.assert_any_call(
             StringMatches(
                 'Response to the sighting request:.*message": "' +
-                "1 sighting successfuly added"
+                "Sighting added"
             )
         )
         mock_print.assert_any_call(

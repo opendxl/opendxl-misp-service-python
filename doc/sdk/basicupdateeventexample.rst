@@ -124,8 +124,8 @@ The output should appear similar to the following:
         }
         Response to the sighting request:
         {
-            "message": "1 sighting successfuly added.",
-            "name": "1 sighting successfuly added.",
+            "message": "Sighting added.",
+            "name": "1 sighting successfully added.",
             "url": "/sightings/add/5acb875e-44a0-402d-8265-013cac110002"
         }
         Response to the search request for the new MISP event:
